@@ -13,7 +13,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { background: #080B14; font-family: 'Courier New', monospace; color: #E8EDF5; overscroll-behavior: none; }
     button { font-family: 'Courier New', monospace; cursor: pointer; border: none; }
-    button:active { opacity: 0.8; }
+    button:active { opacity: 0.75; transform: scale(0.98); }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: #080B14; }
     ::-webkit-scrollbar-thumb { background: #1E2A3A; border-radius: 2px; }
@@ -24,33 +24,35 @@
 <script>
 const { useState, useEffect } = React;
 
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
 const TOPICS = {
   exosomes: {
     label: "Exosomes & Stem Cells", color: "#00E5FF", icon: "◎",
     cards: [
-      { id:"ex1", front:"What is an exosome?", back:"A nano-sized vesicle (30–150nm) secreted by cells carrying proteins, lipids, and genetic material (mRNA, miRNA) to communicate between cells. They are the body's cellular signaling system — not cells themselves.", sales:"'Exosomes are the signaling packets your cells use to trigger repair. We're delivering that signal at therapeutic concentrations — no living cells, no complexity.'", category:"Foundations" },
-      { id:"ex2", front:"Exosomes vs. Stem Cells — key clinical difference?", back:"Stem cells are living, dividing cells. Exosomes are cell-derived nano-vesicles — no living cells, no risk of uncontrolled growth or immune rejection. They deliver regenerative signals without the regulatory and safety complexity of live cell therapy.", sales:"'These aren't stem cells — no living cells at all. It's the signaling packet that does the work. Easier to store, administer, and legally position in your practice.'", category:"Foundations" },
-      { id:"ex3", front:"Why is Wharton's Jelly the gold standard source?", back:"Wharton's Jelly is the gelatinous tissue inside the umbilical cord, rich in MSCs that are immunologically naive, highly proliferative, and produce ~380 growth factors. Cord-derived MSCs are far more potent than adipose or bone marrow-derived cells from adults.", sales:"'Cord-derived is the highest potency source available — young, naive cells producing 380+ growth factors vs ~12 in PRP. That's the difference between a whisper and a shout.'", category:"Foundations" },
-      { id:"ex4", front:"Why is cryo-frozen superior to lyophilized (freeze-dried)?", back:"Lyophilization destroys the lipid bilayer of exosomes. Cryo-frozen products preserve the full exosome membrane structure including surface proteins essential for cell signaling. Lyophilized products only retain cytokines and growth factors — no actual exosomes.", sales:"'Ask any competitor showing lyophilized product: show me your exosome particle count. You won't find them. You're paying for exosomes — you should actually get them.'", category:"Foundations" },
-      { id:"ex5", front:"What are the main exosome application categories?", back:"1. Hair restoration (injectable scalp — esp. post-GLP-1)\n2. Topical skin rejuvenation post-microneedling/laser\n3. Orthopedic/joint (intra-articular — knee, shoulder, spine)\n4. ED support (corpora cavernosa)\n5. IV-grade systemic anti-aging\n6. Dental/periodontal healing", sales:"'You can apply this across your whole practice — aesthetics, ortho, hair, men's health. One relationship, multiple revenue lines.'", category:"Applications" },
-      { id:"ex6", front:"How do exosomes work for hair restoration?", back:"Wharton's Jelly MSC-derived exosomes stimulate and prolong the anagen (growth) phase, shift follicles out of telogen (resting), and support dermal papilla cell repair. ~380 growth factors, collagen, and hyaluronic acid create a regenerative microenvironment. Compare to PRP's ~12 growth factors.", sales:"'One in-office treatment, 20 minutes, cash pay. Your GLP-1 patients are losing hair — you created the problem, now you can solve it and capture another $800–$1,500 per patient.'", category:"Applications" },
-      { id:"ex7", front:"How do dermal fibroblast MSC exosomes work for skin post-procedure?", back:"Applied topically after microneedling/laser, they penetrate the open skin barrier and signal fibroblasts to produce collagen/elastin, reduce inflammation, decrease redness/scarring/hyperpigmentation, and accelerate healing. Promote cell proliferation and turnover.", sales:"'Instead of HA serum post-needling, use exosomes. Better collagen outcomes, shorter downtime, and a $200–$400 premium add-on that's easy to justify to patients.'", category:"Applications" },
-      { id:"ex8", front:"What is Wharton's Jelly ECM Scaffold and how is it used orthopedically?", back:"A viscoelastic biologic 'shock absorber' rich in collagen, hyaluronic acid, and matrix proteins. Injected intra-articularly for knees, shoulders, spine, and small joints. Reduces inflammation, protects cartilage, and supports tissue repair — a potential alternative to joint replacement.", sales:"'For ortho or sports medicine practices: this is a biologic cushioning agent that fits right into their existing injection protocols. No surgery, cash pay, patients see results fast.'", category:"Applications" },
-      { id:"ex9", front:"What are IV-grade MSC exosomes used for?", back:"Systemic anti-aging, disease management, cellular resilience. They act as nano-messengers supporting tissue repair signaling, immune modulation, and inflammation regulation. Viewed as a lower-complexity alternative to IV stem cells with growing interest in longevity medicine.", sales:"'Longevity clinics are moving toward IV exosomes as a flagship anti-aging protocol. High-ticket cash procedure, compelling patient messaging around cellular optimization.'", category:"Applications" },
+      { id:"ex1",  front:"What is an exosome?", back:"A nano-sized vesicle (30–150nm) secreted by cells carrying proteins, lipids, and genetic material (mRNA, miRNA) to communicate between cells. They are the body's cellular signaling system — not cells themselves.", sales:"'Exosomes are the signaling packets your cells use to trigger repair. We're delivering that signal at therapeutic concentrations — no living cells, no complexity.'", category:"Foundations" },
+      { id:"ex2",  front:"Exosomes vs. Stem Cells — key clinical difference?", back:"Stem cells are living, dividing cells. Exosomes are cell-derived nano-vesicles — no living cells, no risk of uncontrolled growth or immune rejection. They deliver regenerative signals without the regulatory and safety complexity of live cell therapy.", sales:"'These aren't stem cells — no living cells at all. It's the signaling packet that does the work. Easier to store, administer, and legally position in your practice.'", category:"Foundations" },
+      { id:"ex3",  front:"Why is Wharton's Jelly the gold standard source?", back:"Wharton's Jelly is the gelatinous tissue inside the umbilical cord, rich in MSCs that are immunologically naive, highly proliferative, and produce ~380 growth factors. Cord-derived MSCs are far more potent than adipose or bone marrow-derived cells from adults.", sales:"'Cord-derived is the highest potency source available — young, naive cells producing 380+ growth factors vs ~12 in PRP. That's the difference between a whisper and a shout.'", category:"Foundations" },
+      { id:"ex4",  front:"Why is cryo-frozen superior to lyophilized (freeze-dried)?", back:"Lyophilization destroys the lipid bilayer of exosomes. Cryo-frozen products preserve the full exosome membrane structure including surface proteins essential for cell signaling. Lyophilized products only retain cytokines and growth factors — no actual exosomes.", sales:"'Ask any competitor showing lyophilized product: show me your exosome particle count. You won't find them. You're paying for exosomes — you should actually get them.'", category:"Foundations" },
+      { id:"ex5",  front:"What are the main exosome application categories?", back:"1. Hair restoration (injectable scalp — esp. post-GLP-1)\n2. Topical skin rejuvenation post-microneedling/laser\n3. Orthopedic/joint (intra-articular — knee, shoulder, spine)\n4. ED support (corpora cavernosa)\n5. IV-grade systemic anti-aging\n6. Dental/periodontal healing", sales:"'You can apply this across your whole practice — aesthetics, ortho, hair, men's health. One relationship, multiple revenue lines.'", category:"Applications" },
+      { id:"ex6",  front:"How do exosomes work for hair restoration?", back:"Wharton's Jelly MSC-derived exosomes stimulate and prolong the anagen (growth) phase, shift follicles out of telogen (resting), and support dermal papilla cell repair. ~380 growth factors, collagen, and hyaluronic acid create a regenerative microenvironment. Compare to PRP's ~12 growth factors.", sales:"'One in-office treatment, 20 minutes, cash pay. Your GLP-1 patients are losing hair — you created the problem, now you can solve it and capture another $800–$1,500 per patient.'", category:"Applications" },
+      { id:"ex7",  front:"How do dermal fibroblast MSC exosomes work for skin post-procedure?", back:"Applied topically after microneedling/laser, they penetrate the open skin barrier and signal fibroblasts to produce collagen/elastin, reduce inflammation, decrease redness/scarring/hyperpigmentation, and accelerate healing. Promote cell proliferation and turnover.", sales:"'Instead of HA serum post-needling, use exosomes. Better collagen outcomes, shorter downtime, and a $200–$400 premium add-on that's easy to justify to patients.'", category:"Applications" },
+      { id:"ex8",  front:"What is Wharton's Jelly ECM Scaffold and how is it used orthopedically?", back:"A viscoelastic biologic 'shock absorber' rich in collagen, hyaluronic acid, and matrix proteins. Injected intra-articularly for knees, shoulders, spine, and small joints. Reduces inflammation, protects cartilage, and supports tissue repair — a potential alternative to joint replacement.", sales:"'For ortho or sports medicine practices: this is a biologic cushioning agent that fits right into their existing injection protocols. No surgery, cash pay, patients see results fast.'", category:"Applications" },
+      { id:"ex9",  front:"What are IV-grade MSC exosomes used for?", back:"Systemic anti-aging, disease management, cellular resilience. They act as nano-messengers supporting tissue repair signaling, immune modulation, and inflammation regulation. Viewed as a lower-complexity alternative to IV stem cells with growing interest in longevity medicine.", sales:"'Longevity clinics are moving toward IV exosomes as a flagship anti-aging protocol. High-ticket cash procedure, compelling patient messaging around cellular optimization.'", category:"Applications" },
       { id:"ex10", front:"What are NK (Natural Killer) exosomes and how do they differ from MSC exosomes?", back:"NK-derived exosomes carry the targeted signaling of NK cells. Used for immune modulation, clearing senescent ('aged') cells, oncology support (reducing chemo side effects), and aggressive anti-aging. Considered 'next generation' above standard MSC exosomes.", sales:"'NK exosomes are the premium tier — for patients doing aggressive longevity protocols or oncology support. The senescent cell clearance story is very compelling for high-end anti-aging patients.'", category:"Applications" },
-      { id:"ex11", front:"How do exosomes compare to PRP for hair restoration?", back:"PRP delivers ~12 growth factors from the patient's own blood — requires a blood draw and centrifuge; results vary by patient platelet quality and age. Wharton's Jelly exosomes deliver ~380 growth factors. Off-the-shelf, no blood draw, consistent potency regardless of patient age or health.", sales:"'PRP is the foundation. Exosomes are the upgrade — 380 growth factors vs 12, no blood draw, consistent potency. You can offer both: PRP is entry level, exosomes are premium tier.'", category:"Competitive" },
-      { id:"ex12", front:"How are exosomes used in dental and periodontal applications?", back:"MSC-derived exosomes are angiogenic, anti-inflammatory, anti-fibrotic, and anti-microbial. Applied in craniofacial and periodontal tissue settings to accelerate healing, reduce inflammation, and support bone and soft-tissue regeneration. Relevant for grafting, extractions, implants, and overall oral health outcomes.", sales:"'Dental and periodontal practices are an underserved market for exosomes — most reps don't even mention it. For oral surgeons and periodontists doing implants and grafts, faster healing and better outcomes are a compelling story.'", category:"Applications" },
-      { id:"ex13", front:"What is the ED Exosome + AM Matrix protocol?", back:"An allogenic perinatal tissue-derived flowable biologic composed of umbilical cord, placental tissue, and amniotic membrane. Contains ECM, growth factors, and Wharton's Jelly MSC signaling molecules. Supports erectile function by promoting angiogenesis, reducing inflammation/fibrosis, and supporting neurovascular repair in the corpora cavernosa.", sales:"'For men's health and urology practices: this is the injectable ED biologic protocol. Patients who don't respond fully to TRT or PDE5s are excellent candidates — it's addressing root neurovascular causes, not just symptoms.'", category:"Applications" },
+      { id:"ex11", front:"How do exosomes compare to PRP for hair restoration?", back:"PRP delivers ~12 growth factors from the patient's own blood — requires a blood draw; results vary by patient age and health. Wharton's Jelly exosomes deliver ~380 growth factors. Off-the-shelf, no blood draw, consistent potency regardless of patient age or health.", sales:"'PRP is the foundation. Exosomes are the upgrade — 380 growth factors vs 12, no blood draw, consistent potency. Offer both: PRP is entry level, exosomes are premium tier.'", category:"Competitive" },
+      { id:"ex12", front:"How are exosomes used in dental and periodontal applications?", back:"MSC-derived exosomes are angiogenic, anti-inflammatory, anti-fibrotic, and anti-microbial. Applied in craniofacial and periodontal tissue settings to accelerate healing, reduce inflammation, and support bone and soft-tissue regeneration. Relevant for grafting, extractions, implants, and oral health outcomes.", sales:"'Dental and periodontal practices are an underserved market for exosomes — most reps don't mention it. For oral surgeons doing implants and grafts, faster healing and better outcomes is a compelling story.'", category:"Applications" },
+      { id:"ex13", front:"What is the ED Exosome + AM Matrix protocol?", back:"An allogenic perinatal tissue-derived flowable biologic composed of umbilical cord, placental tissue, and amniotic membrane. Contains ECM, growth factors, and Wharton's Jelly MSC signaling molecules. Supports erectile function by promoting angiogenesis, reducing inflammation/fibrosis, and supporting neurovascular repair in the corpora cavernosa.", sales:"'For men's health and urology practices: this is the injectable ED biologic protocol. Patients who don't respond fully to TRT or PDE5s are excellent candidates — it addresses root neurovascular causes, not just symptoms.'", category:"Applications" },
       { id:"ex14", front:"What are IV-grade umbilical cord MSC stem cells used for?", back:"Allogenic cord-derived MSCs described as a 'fountain of youth' therapy. May help replace cell types the body produces less of with age, support growth of younger replacement cells, aid tissue repair in skin/heart/lungs/kidneys, and reduce scarring including post-heart attack fibrosis.", sales:"'IV MSC stem cells are the flagship high-ticket longevity offering — for practices catering to patients who want the most aggressive cellular optimization available. This is concierge medicine territory.'", category:"Stem Cells" },
-      { id:"ex15", front:"What are IV-grade NK stem cells and who are they for?", back:"Allogenic NK stem cells and their exosomes are considered 'powerhouse' regenerative tools. Particularly relevant for complex health challenges: autoimmune, cardiovascular, or neurodegenerative conditions, and aggressive anti-aging. Support senescent cell clearance, help detoxify internal environment, and may enhance efficacy of other regenerative treatments.", sales:"'NK stem cells are for the patient with complex challenges or aggressive anti-aging goals — autoimmune, neuro, cardiovascular. They create a cleaner environment so everything else works better. Highest-tier biologic conversation available.'", category:"Stem Cells" },
+      { id:"ex15", front:"What are IV-grade NK stem cells and who are they for?", back:"Allogenic NK stem cells and their exosomes are considered 'powerhouse' regenerative tools. Particularly relevant for complex health challenges: autoimmune, cardiovascular, or neurodegenerative conditions, and aggressive anti-aging. Support senescent cell clearance, detoxify internal environment, and may enhance efficacy of other regenerative treatments.", sales:"'NK stem cells are for the patient with complex challenges or aggressive anti-aging goals — autoimmune, neuro, cardiovascular. They create a cleaner environment so everything else works better. Highest-tier biologic conversation available.'", category:"Stem Cells" },
     ]
   },
   peptides_metabolic: {
     label: "Peptides: Metabolic", color: "#FFB74D", icon: "◈",
     cards: [
-      { id:"pm1", front:"What is semaglutide and how does it work?", back:"A GLP-1 receptor agonist that slows gastric emptying and signals the brain's hunger center that you're full sooner. Reduces appetite, lowers calorie intake, stabilizes blood sugar. Brand names: Ozempic (diabetes), Wegovy (weight loss). Compounded versions available through 503A during shortage periods.", sales:"'Semaglutide is still the most prescribed weight loss compound. Your 503A relationship is what lets clinics offer it at accessible price points versus $1,000+/month brand name.'", category:"GLP-1s", sizes:"2mg · 5mg · 10mg · 20mg · 50mg" },
-      { id:"pm2", front:"What is tirzepatide and how does it differ from semaglutide?", back:"A dual GLP-1 + GIP receptor agonist (Mounjaro/Zepbound). GIP adds a second satiety and metabolic pathway. Greater average weight loss (~20–22% body weight vs ~15% for sema). Often better GI tolerance and smoother glucose response.", sales:"'Tirzepatide is the upgrade — dual receptor, better results. Clinics that started with sema are transitioning their best patients to tirze. Embark compounds both.'", category:"GLP-1s", sizes:"10mg · 30mg · 50mg · 60mg · 75mg · 100mg · 120mg" },
-      { id:"pm3", front:"What is Retatrutide ('Triple G')?", back:"A triple agonist targeting GLP-1, GIP, and glucagon receptors. Glucagon adds fat-burning and thermogenic effect on top of appetite suppression. Early trials show the highest weight loss numbers of any compound (potentially 25%+ body weight). Still emerging/research phase.", sales:"'Retatrutide is the next wave. Clinics positioning as cutting-edge weight loss centers want to know about it — it's a conversation opener that shows you know this space deeply.'", category:"GLP-1s", sizes:"12mg · 24mg · 30mg · 60mg" },
+      { id:"pm1", front:"What is semaglutide (GLP-1 S) and how does it work?", back:"A GLP-1 receptor agonist that slows gastric emptying and signals the brain's hunger center that you're full sooner. Reduces appetite, lowers calorie intake, stabilizes blood sugar. Brand names: Ozempic (diabetes), Wegovy (weight loss). Compounded as GLP-1 S through 503A during shortage periods.", sales:"'Semaglutide is still the most prescribed weight loss compound. Your 503A relationship is what lets clinics offer it at accessible price points versus $1,000+/month brand name.'", category:"GLP-1 S (Sema)", sizes:"2mg · 5mg · 10mg · 20mg · 50mg" },
+      { id:"pm2", front:"What is tirzepatide (GLP-1 T) and how does it differ from semaglutide?", back:"A dual GLP-1 + GIP receptor agonist (Mounjaro/Zepbound). Compounded as GLP-1 T. GIP adds a second satiety and metabolic pathway. Greater average weight loss (~20–22% body weight vs ~15% for sema). Often better GI tolerance and smoother glucose response.", sales:"'Tirzepatide is the upgrade — dual receptor, better results. Clinics that started with sema are transitioning their best patients to tirze. GLP-1 T is what you'll see on the script pad.'", category:"GLP-1 T (Tirze)", sizes:"10mg · 30mg · 50mg · 60mg · 75mg · 100mg · 120mg" },
+      { id:"pm3", front:"What is retatrutide (GLP-1 R) — the 'Triple G'?", back:"A triple agonist targeting GLP-1, GIP, and glucagon receptors. Compounded as GLP-1 R. Glucagon adds fat-burning and thermogenic effect on top of appetite suppression. Early trials show potentially 25%+ body weight loss. Still emerging/research phase.", sales:"'Retatrutide is the next wave — GLP-1 R on the script pad. Clinics positioning as cutting-edge weight loss centers want to know about it. It's a conversation opener that shows you know this space deeply.'", category:"GLP-1 R (Retatro)", sizes:"12mg · 24mg · 30mg · 60mg" },
       { id:"pm4", front:"What is AOD-9604?", back:"A fragment of HGH (amino acids 176–191) that targets fat metabolism specifically without HGH's growth or blood sugar side effects. Stimulates lipolysis (fat breakdown) and inhibits lipogenesis. Used for stubborn fat and body contouring alongside GLP-1 protocols.", sales:"'Great GLP-1 companion — when patients plateau on sema, add AOD to target stubborn fat pockets. No HGH side effects, pure fat metabolism signal. Easy upsell to existing weight loss patients.'", category:"Metabolic", sizes:"10mg" },
       { id:"pm5", front:"What is MOTS-C?", back:"A mitochondria-derived peptide that improves metabolic flexibility and insulin sensitivity. Helps the body switch between fat and glucose for fuel efficiently. Supports fat loss, energy, and exercise tolerance especially under metabolic stress.", sales:"'MOTS-C is the metabolic optimizer — not a GLP-1, but a complement to it. For patients who plateau or want sustained energy improvements alongside their weight loss protocol.'", category:"Metabolic", sizes:"20mg" },
       { id:"pm6", front:"What is HCG and why is it used in weight loss protocols?", back:"Human Chorionic Gonadotropin. Used with very low calorie diets to preserve lean muscle mass during fat loss. Supports fat mobilization and helps manage appetite and energy during caloric restriction.", sales:"'HCG is still popular in medically supervised weight loss. It fits alongside GLP-1 protocols for patients who want lean mass protection during aggressive weight loss.'", category:"Metabolic", sizes:"5000IU · 10000IU" },
@@ -69,19 +71,19 @@ const TOPICS = {
   peptides_hormone: {
     label: "Peptides: Hormone & Longevity", color: "#B388FF", icon: "✦",
     cards: [
-      { id:"ph1", front:"What is CJC-1295 / Ipamorelin and why are they stacked?", back:"CJC-1295 is a GHRH analogue that extends GH pulses. Ipamorelin is a selective GHRP that triggers GH release without affecting cortisol or prolactin. Together: synergistic, clean GH pulses. CJC without DAC = short-acting, dosed nightly. CJC with DAC = long-acting, 1–2x/week.", sales:"'Most popular GH peptide stack — patients notice better sleep in 2 weeks, body composition changes in 3 months. Very high compliance because results are tangible and early.'", category:"GH Peptides", sizes:"CJC No-DAC 10mg · CJC-DAC 10mg · Blend 5mg/5mg" },
-      { id:"ph2", front:"What is Tesamorelin and when is it preferred over CJC?", back:"A GHRH analogue with particular effect on visceral (deep belly) fat. FDA-approved for HIV-related lipodystrophy, widely used off-label for central fat reduction. Stacked with Ipamorelin for synergistic GH support and sleep improvement.", sales:"'Tesamorelin is the targeted belly fat peptide — preferred for patients with significant visceral fat. High patient satisfaction, very visible results at the midsection.'", category:"GH Peptides", sizes:"10mg · Blend w/ Ipa: 15mg total" },
-      { id:"ph3", front:"What is Sermorelin?", back:"One of the earliest GHRH analogues. Stimulates pituitary GH release naturally. Supports lean body mass, metabolic health, sleep quality, and recovery. Shorter half-life than CJC. Good entry-level GH peptide for cost-sensitive patients.", sales:"'Sermorelin is the entry-level GH peptide — excellent price point. Good for practices introducing GH therapy before upgrading patients to CJC/Ipamorelin.'", category:"GH Peptides", sizes:"10mg" },
-      { id:"ph4", front:"What is IGF-1 LR3?", back:"A long-acting analogue of Insulin-like Growth Factor 1. Directly stimulates muscle protein synthesis, reduces protein breakdown, supports recovery, and modulates glucose metabolism. More targeted muscle-building effect than GH peptides.", sales:"'IGF-1 LR3 is for the serious body composition patient — athletes, post-injury muscle rebuilding, age-related muscle loss. Often the next step for patients who've maxed out GH peptide benefits.'", category:"Hormone", sizes:"1mg" },
-      { id:"ph5", front:"What is PT-141 and how does it differ from ED medications?", back:"Bremelanotide. Works on central melanocortin receptors (MC3R/MC4R) in the brain — not just blood flow like PDE5 inhibitors (Viagra/Cialis). Increases sexual desire centrally in both men and women. FDA-approved for HSDD in women (Vyleesi). Nasal or injectable.", sales:"'PT-141 is the libido peptide that works centrally — desire, not just mechanics. Huge for men's health and women's health practices. Patients are often shocked it works when nothing else has.'", category:"Specialty", sizes:"10mg" },
-      { id:"ph6", front:"What is Epithalon and why is it compelling for longevity patients?", back:"A tetrapeptide that supports telomere elongation and DNA repair. Associated with healthy aging, improved sleep cycles, and cellular resilience. Backed by decades of Russian research. One of the most discussed peptides in the longevity/biohacking community.", sales:"'Epithalon is the telomere peptide — one of the most exciting longevity compounds for anti-aging practices. Patients who care about biological aging are very receptive to the telomere story.'", category:"Longevity", sizes:"10mg · 50mg" },
-      { id:"ph7", front:"What is NAD+ and why is it central to anti-aging protocols?", back:"Nicotinamide Adenine Dinucleotide. A cofactor in every mitochondrial energy reaction and critical for DNA repair (via PARP enzymes) and sirtuin (longevity gene) activation. NAD+ declines ~50% by age 50. IV NAD+ is one of the most sought-after longevity treatments.", sales:"'NAD+ is one of the easiest sells in functional medicine — patients already know about it from podcasts. IV NAD+ is a flagship revenue driver for anti-aging and wellness practices.'", category:"Longevity", sizes:"500mg · 1000mg" },
-      { id:"ph8", front:"What is Semax?", back:"A nootropic peptide derived from ACTH. Enhances BDNF (Brain-Derived Neurotrophic Factor) and cerebral blood flow. Used for focus, mental stamina, neuroprotection, and cognitive performance. Also studied for stroke recovery and neuroprotection.", sales:"'Semax is for the cognitive optimization patient — executives, high performers, anyone with brain fog. It opens the door to the nootropic/biohacking segment that's rapidly growing in functional medicine.'", category:"Cognitive", sizes:"30mg" },
-      { id:"ph9", front:"What is Selank?", back:"An anxiolytic/nootropic peptide that modulates GABA, serotonin, and dopamine systems. Promotes calm, focused mood without sedation or addiction risk. Often described as anxiety relief with a cognitive edge. Nasal administration.", sales:"'Selank is the anxiety peptide that doesn't sedate — patients stay sharp but stop feeling wired and anxious. Great for stressed, high-achieving patients in functional medicine practices.'", category:"Cognitive", sizes:"5mg · 10mg" },
+      { id:"ph1",  front:"What is CJC-1295 / Ipamorelin and why are they stacked?", back:"CJC-1295 is a GHRH analogue that extends GH pulses. Ipamorelin is a selective GHRP that triggers GH release without affecting cortisol or prolactin. Together: synergistic, clean GH pulses. CJC without DAC = short-acting, dosed nightly. CJC with DAC = long-acting, 1–2x/week.", sales:"'Most popular GH peptide stack — patients notice better sleep in 2 weeks, body composition changes in 3 months. Very high compliance because results are tangible and early.'", category:"GH Peptides", sizes:"CJC No-DAC 10mg · CJC-DAC 10mg · Blend 5mg/5mg" },
+      { id:"ph2",  front:"What is Tesamorelin and when is it preferred over CJC?", back:"A GHRH analogue with particular effect on visceral (deep belly) fat. FDA-approved for HIV-related lipodystrophy, widely used off-label for central fat reduction. Stacked with Ipamorelin for synergistic GH support and sleep improvement.", sales:"'Tesamorelin is the targeted belly fat peptide — preferred for patients with significant visceral fat. High patient satisfaction, very visible results at the midsection.'", category:"GH Peptides", sizes:"10mg · Blend w/ Ipa: 15mg total" },
+      { id:"ph3",  front:"What is Sermorelin?", back:"One of the earliest GHRH analogues. Stimulates pituitary GH release naturally. Supports lean body mass, metabolic health, sleep quality, and recovery. Shorter half-life than CJC. Good entry-level GH peptide for cost-sensitive patients.", sales:"'Sermorelin is the entry-level GH peptide — excellent price point. Good for practices introducing GH therapy before upgrading patients to CJC/Ipamorelin.'", category:"GH Peptides", sizes:"10mg" },
+      { id:"ph4",  front:"What is IGF-1 LR3?", back:"A long-acting analogue of Insulin-like Growth Factor 1. Directly stimulates muscle protein synthesis, reduces protein breakdown, supports recovery, and modulates glucose metabolism. More targeted muscle-building effect than GH peptides.", sales:"'IGF-1 LR3 is for the serious body composition patient — athletes, post-injury muscle rebuilding, age-related muscle loss. Often the next step for patients who've maxed out GH peptide benefits.'", category:"Hormone", sizes:"1mg" },
+      { id:"ph5",  front:"What is PT-141 and how does it differ from ED medications?", back:"Bremelanotide. Works on central melanocortin receptors (MC3R/MC4R) in the brain — not just blood flow like PDE5 inhibitors (Viagra/Cialis). Increases sexual desire centrally in both men and women. FDA-approved for HSDD in women (Vyleesi). Nasal or injectable.", sales:"'PT-141 is the libido peptide that works centrally — desire, not just mechanics. Huge for men's health and women's health practices. Patients are often shocked it works when nothing else has.'", category:"Specialty", sizes:"10mg" },
+      { id:"ph6",  front:"What is Epithalon and why is it compelling for longevity patients?", back:"A tetrapeptide that supports telomere elongation and DNA repair. Associated with healthy aging, improved sleep cycles, and cellular resilience. Backed by decades of Russian research. One of the most discussed peptides in the longevity/biohacking community.", sales:"'Epithalon is the telomere peptide — one of the most exciting longevity compounds for anti-aging practices. Patients who care about biological aging are very receptive to the telomere story.'", category:"Longevity", sizes:"10mg · 50mg" },
+      { id:"ph7",  front:"What is NAD+ and why is it central to anti-aging protocols?", back:"Nicotinamide Adenine Dinucleotide. A cofactor in every mitochondrial energy reaction and critical for DNA repair (via PARP enzymes) and sirtuin (longevity gene) activation. NAD+ declines ~50% by age 50. IV NAD+ is one of the most sought-after longevity treatments.", sales:"'NAD+ is one of the easiest sells in functional medicine — patients already know about it from podcasts. IV NAD+ is a flagship revenue driver for anti-aging and wellness practices.'", category:"Longevity", sizes:"500mg · 1000mg" },
+      { id:"ph8",  front:"What is Semax?", back:"A nootropic peptide derived from ACTH. Enhances BDNF (Brain-Derived Neurotrophic Factor) and cerebral blood flow. Used for focus, mental stamina, neuroprotection, and cognitive performance. Also studied for stroke recovery and neuroprotection.", sales:"'Semax is for the cognitive optimization patient — executives, high performers, anyone with brain fog. It opens the door to the nootropic/biohacking segment that's rapidly growing in functional medicine.'", category:"Cognitive", sizes:"30mg" },
+      { id:"ph9",  front:"What is Selank?", back:"An anxiolytic/nootropic peptide that modulates GABA, serotonin, and dopamine systems. Promotes calm, focused mood without sedation or addiction risk. Often described as anxiety relief with a cognitive edge. Nasal administration.", sales:"'Selank is the anxiety peptide that doesn't sedate — patients stay sharp but stop feeling wired and anxious. Great for stressed, high-achieving patients in functional medicine practices.'", category:"Cognitive", sizes:"5mg · 10mg" },
       { id:"ph10", front:"What is Thymosin Alpha-1 (TA1) and who is it for?", back:"A 28-amino acid thymus-derived peptide that modulates and strengthens the immune system. Increases T-cell maturation, NK cell activity, and dendritic cell function. Used for immune deficiency, chronic infections, long COVID, and immune optimization. Used in 35+ countries.", sales:"'TA1 has an incredible track record internationally. For long COVID, chronic fatigue, or frequent illness patients — it's a compelling immune optimization protocol functional medicine docs love.'", category:"Immune", sizes:"10mg" },
-      { id:"ph11", front:"What is PE-22-28?", back:"A synthetic peptide fragment of spadin — a natural antidepressant peptide. Acts on TREK-1 channels (potassium channels in the brain involved in mood regulation). Research suggests antidepressant and neuroprotective effects with a cleaner profile than pharmaceutical antidepressants.", sales:"'PE-22-28 is for the functional medicine doc seeing patients who want off SSRIs or who haven't responded to them. It's a very compelling story for practices building mood and cognitive optimization protocols.'", category:"Cognitive", sizes:"10mg" },
-      { id:"ph12", front:"What is Oxytocin and why is it used therapeutically?", back:"The 'bonding hormone' — regulates social connection, trust, stress response, and mood. Therapeutic use: anxiety, PTSD, autism spectrum support, relationship/couples therapy adjunct, and general emotional well-being. Compounded as nasal spray or injectable.", sales:"'Oxytocin is a conversation opener in practices doing mental health or trauma-informed care. Psychiatry-adjacent functional medicine docs and integrative therapists find it very compelling — it's still niche but growing fast.'", category:"Specialty", sizes:"10mg" },
-      { id:"ph13", front:"What is Hexarelin?", back:"A potent synthetic GHRP that stimulates GH release more strongly than Ipamorelin. Also has direct cardioprotective effects independent of GH. More GH stimulation but also more cortisol/prolactin activity than Ipamorelin — step up in potency.", sales:"'Hexarelin is for practices working with cardiology-adjacent longevity patients, or those wanting more aggressive GH stimulation than Ipamorelin provides. It's a step up in potency with additional cardiac benefits.'", category:"GH Peptides", sizes:"2mg" },
+      { id:"ph11", front:"What is PE-22-28?", back:"A synthetic peptide fragment of spadin — a natural antidepressant peptide. Acts on TREK-1 channels (potassium channels in the brain involved in mood regulation). Research suggests antidepressant and neuroprotective effects with a cleaner profile than pharmaceutical antidepressants.", sales:"'PE-22-28 is for the functional medicine doc seeing patients who want off SSRIs or who haven't responded to them. Very compelling for practices building mood and cognitive optimization protocols.'", category:"Cognitive", sizes:"10mg" },
+      { id:"ph12", front:"What is Oxytocin and why is it used therapeutically?", back:"The 'bonding hormone' — regulates social connection, trust, stress response, and mood. Therapeutic use: anxiety, PTSD, autism spectrum support, and general emotional well-being. Compounded as nasal spray or injectable.", sales:"'Oxytocin is a conversation opener in practices doing mental health or trauma-informed care. Psychiatry-adjacent functional medicine docs find it very compelling — it's still niche but growing fast.'", category:"Specialty", sizes:"10mg" },
+      { id:"ph13", front:"What is Hexarelin?", back:"A potent synthetic GHRP that stimulates GH release more strongly than Ipamorelin. Also has direct cardioprotective effects independent of GH — research on cardiac repair and protection. More GH stimulation but also more cortisol/prolactin activity than Ipamorelin.", sales:"'Hexarelin is for practices working with cardiology-adjacent longevity patients, or those wanting more aggressive GH stimulation than Ipamorelin provides. A step up in potency with additional cardiac benefits.'", category:"GH Peptides", sizes:"2mg" },
     ]
   },
   peptides_aesthetic: {
@@ -95,28 +97,28 @@ const TOPICS = {
   prp: {
     label: "PRP & Equipment", color: "#FFF176", icon: "⊕",
     cards: [
-      { id:"prp1", front:"What is PRP and what makes this supplier's kits different?", back:"Platelet-Rich Plasma — concentrated platelets from the patient's own blood. These kits use citrate anticoagulant (not sodium heparin), a molecular-specific polyester gel separator, closed system (no external activators needed), 8-minute spin at 3,500 RPM. Minimizes contamination and human error.", sales:"'The closed system and short spin time are key practice efficiency points — less prep time, less contamination risk. For a busy practice doing multiple procedures a day, that matters.'", category:"Foundations" },
+      { id:"prp1", front:"What is PRP and what makes this supplier's kits different?", back:"Platelet-Rich Plasma — concentrated platelets from the patient's own blood. These kits use citrate anticoagulant (not sodium heparin), molecular-specific polyester gel separator, closed system (no external activators needed), 8-minute spin at 3,500 RPM. Minimizes contamination and human error.", sales:"'The closed system and short spin time are key practice efficiency points — less prep time, less contamination risk. For a busy practice doing multiple procedures a day, that matters.'", category:"Foundations" },
       { id:"prp2", front:"What are the two PRP kit options?", back:"HA PRP Kit: preloaded with non-cross-linked hyaluronic acid — creates natural bio-filler for patients avoiding synthetic fillers. Biotin PRP Kit: preloaded with Vitamin B7 to specifically support hair follicle health. Both use the same closed system and spin protocol.", sales:"'The HA kit is great for practices with anti-filler patients — it's a natural bio-filler story. The Biotin kit slots directly into any hair restoration protocol, especially alongside exosomes.'", category:"Products" },
       { id:"prp3", front:"What is the Bio-Activator (Photo-Activator)?", back:"An LED device placed over the PRP tube after centrifugation. Uses specific light wavelengths to activate platelets, stimulating greater growth factor and cytokine release — no chemicals added. Particularly beneficial for older or less-healthy patients whose platelet activity may be reduced.", sales:"'The Bio-Activator is an easy upsell for any practice doing PRP — more growth factors from the same blood draw, no chemicals. Especially compelling pitch for practices with an older patient demographic.'", category:"Products" },
       { id:"prp4", front:"What is the Bio-Incubator?", back:"Converts PRP into PRF (Platelet-Rich Fibrin) by controlled heating and cooling. PRF is a thicker, gel-like natural bio-filler used for aesthetic volume and structural support — for patients who don't want synthetic fillers like Restylane or Juvederm.", sales:"'The Bio-Incubator turns a PRP practice into a natural filler practice. For the growing patient segment rejecting synthetic fillers, this is a significant differentiator and premium revenue opportunity.'", category:"Products" },
       { id:"prp5", front:"Which centrifuge for which practice type?", back:"VitalitySpin CENT8: 8 tubes x 10–12mL — sized for medi-spa, hair, and facial aesthetic practices. VitalitySpin CENT6 / CENT4-XL: 6 or 4 tubes x 30–50mL — sized for orthopedic clinics needing larger prep volumes. Adapters available for flexibility.", sales:"'Matching the centrifuge to the practice is important — don't oversell an ortho machine to a medi-spa. Lead with CENT8 for aesthetics and hair, CENT6/CENT4-XL for ortho and sports medicine.'", category:"Equipment" },
       { id:"prp6", front:"What is the NanoPen PRO Microneedling Device?", back:"A microneedling pen using ultra-sharp, fine needles to create controlled micro-injuries in the skin. Stimulates the body's natural healing response, improves skin texture, and reduces the appearance of scars. Creates the ideal channel for topical exosome application immediately post-procedure.", sales:"'The NanoPen PRO is a natural equipment bundle with the exosome and GHKCu line — practices that microneedle are your best topical exosome customers. Leading with the device opens the consumable relationship.'", category:"Equipment" },
-      { id:"prp7", front:"What makes this lab's peptide quality different from 503A compounds?", back:"These peptides are manufactured in a US cGMP-certified laboratory with high purity standards and strict regulatory oversight. Most peptides on the market are compounded by 503A/B pharmacies from third-party (often overseas) suppliers with more variability in origin and process control. No unnecessary fillers or additives.", sales:"'The quality story is a real differentiator — US cGMP lab, not a compounding pharmacy sourcing from overseas. For docs who've had quality concerns or patient complaints about other suppliers, this is a meaningful conversation.'", category:"Foundations" },
+      { id:"prp7", front:"What makes this lab's peptide quality different from 503A compounds?", back:"These peptides are manufactured in a US cGMP-certified laboratory with high purity standards and strict regulatory oversight. Most peptides on the market are compounded by 503A/B pharmacies from third-party (often overseas) suppliers with more variability in origin and process control. No unnecessary fillers or additives.", sales:"'The quality story is a real differentiator — US cGMP lab, not a compounding pharmacy sourcing from overseas. For docs who've had quality concerns or patient complaints from other suppliers, this is a meaningful conversation.'", category:"Foundations" },
     ]
   },
   sales_plays: {
     label: "Sales Plays", color: "#FFFFFF", icon: "▶",
     cards: [
-      { id:"sp1", front:"What's your GLP-1 clinic door opener?", back:"GLP-1 clinics are creating hair loss in their patients — telogen effluvium affects ~30% of semaglutide users. Natural entry: 'You're writing a lot of GLP-1 prescriptions — are you addressing the hair loss side effect? We have an in-office cash solution your patients will love.'", sales:"'You created the problem. I can help you solve it. One exosome scalp treatment, cash pay, $800–$1,500, 20 minutes. Happy patient, new revenue stream.'", category:"Door Openers" },
-      { id:"sp2", front:"How do you handle 'we already do PRP for hair'?", back:"PRP delivers ~12 growth factors from the patient's own blood; quality varies by age and health. Wharton's Jelly exosomes deliver ~380 growth factors, no blood draw needed, consistent off-the-shelf potency. Position PRP as entry level and exosomes as the premium upgrade — they're not in competition.", sales:"'Great — PRP is the foundation. Exosomes are the upgrade. 380 growth factors versus 12, no blood draw, consistent potency. You can offer both and charge more for the premium option.'", category:"Objections" },
-      { id:"sp3", front:"How do you explain 503A compounding to a skeptical physician?", back:"503A pharmacies create patient-specific compounded medications under state pharmacy board oversight. During FDA drug shortage periods, 503As can legally compound copies of shortage drugs. Each prescription is for an individual patient — not bulk manufacturing. PCAB accreditation signals quality compliance.", sales:"'We operate under the 503A model — patient-specific, state-licensed, legal during active shortage periods. Our pharmacist monitors the shortage list and our compliance team stays current. This is established, legitimate medicine.'", category:"Compliance" },
-      { id:"sp4", front:"What's your pitch for a men's health / TRT clinic?", back:"TRT patients are already biohacking-minded and cash-pay. Natural extensions: PT-141 for libido, BPC-157/TB-500 for athletic performance, GH peptides for body composition, ED Exosome + AM Matrix for patients not getting full TRT results.", sales:"'Your TRT patients are your best peptide customers — cash-pay, motivated, already biohacking-minded. PT-141, GH peptides, Wolverine for the active guys — these are natural extensions of what they're already doing.'", category:"Door Openers" },
-      { id:"sp5", front:"What's your functional medicine practice pitch?", back:"Functional medicine docs already believe in root-cause treatment. Entry points: TA1 for immune patients (long COVID, chronic infections), NAD+ for energy/aging, Semax/Selank for cognitive and anxiety patients, PE-22-28 for mood/SSRI alternatives, Epithalon for anti-aging protocols.", sales:"'Functional medicine is where peptides were born in the US market. These docs have the mindset — they just need the right supplier. Lead with TA1 for immune and NAD for energy, then let patient demand pull through the rest.'", category:"Door Openers" },
-      { id:"sp6", front:"What is the private label opportunity?", back:"The lab offers private label — the product ships with the practice's branding on the label (e.g., 'Healthy Hair Society'). Increases practice buy-in, patient loyalty to the practice, and perceived value. Higher margin for the practice, more stickiness for you as the rep.", sales:"'The private label option is powerful for retention — when the label says their name, patients reorder through them. It's also a conversation that shows you're thinking about their business long-term, not just moving product.'", category:"Strategy" },
-      { id:"sp7", front:"What's the drop-ship vs. in-office inventory conversation?", back:"In-office inventory: practice orders in volume at discount, dispenses in-person, higher margin. Drop-ship: practice sends patient shipping info, lab ships directly to patient — ideal for telehealth. Both options available; in-office has better margins, drop-ship enables telehealth scale.", sales:"'Telehealth practices love drop-ship — they see the patient on screen, send us the order, we handle fulfillment. For in-person practices, in-office inventory is higher margin and creates a tangible point of care experience.'", category:"Strategy" },
-      { id:"sp8", front:"What's your pitch for an aesthetics / medi-spa practice?", back:"Medi-spas doing microneedling and laser are a perfect fit for: topical exosomes post-procedure, GHKCu topical spray, GLOW/KLOW injectable stacks, NanoPen PRO microneedling device, and PRP kits (HA or Biotin). Multiple product lines, one relationship.", sales:"'You're already creating the channel for exosomes every time you needle. The topical exosome is the natural premium add-on — better results, shorter downtime, $200–$400 more per treatment. I can also help you upgrade your PRP protocol and microneedling equipment.'", category:"Door Openers" },
-      { id:"sp9", front:"What's your pitch for an oral surgeon or periodontist?", back:"MSC-derived exosomes are angiogenic, anti-inflammatory, anti-fibrotic, and anti-microbial in dental/periodontal settings. Applications include post-extraction healing, implant osseointegration, graft outcomes, and periodontal tissue repair. Most reps never mention this to dental practices.", sales:"'I'm probably the first rep who's talked to you about exosomes in a dental context. The healing and tissue repair story is directly applicable to implants and grafts — less inflammation, faster healing, better outcomes.'", category:"Door Openers" },
-      { id:"sp10", front:"What's your pitch for an orthopedic or sports medicine practice?", back:"Wharton's Jelly ECM Scaffold is a viscoelastic biologic shock absorber for intra-articular injections — knees, shoulders, spine, small joints. Also: Wolverine stack for tissue repair, SS-31 for mitochondrial recovery, and VitalitySpin large-format centrifuge for high-volume PRP.", sales:"'For ortho: the ECM scaffold is a biologic alternative for patients who aren't surgical candidates or who want to delay joint replacement. The Wolverine stack is for the athlete or active patient. The large-format centrifuge gives you high-volume PRP in-house.'", category:"Door Openers" },
+      { id:"sp1",  front:"What's your GLP-1 clinic door opener?", back:"GLP-1 clinics are creating hair loss in their patients — telogen effluvium affects ~30% of semaglutide users. Natural entry: 'You're writing a lot of GLP-1 prescriptions — are you addressing the hair loss side effect? We have an in-office cash solution your patients will love.'", sales:"'You created the problem. I can help you solve it. One exosome scalp treatment, cash pay, $800–$1,500, 20 minutes. Happy patient, new revenue stream.'", category:"Door Openers" },
+      { id:"sp2",  front:"How do you handle 'we already do PRP for hair'?", back:"PRP delivers ~12 growth factors from the patient's own blood; quality varies by age and health. Wharton's Jelly exosomes deliver ~380 growth factors, no blood draw needed, consistent potency. Position PRP as entry level and exosomes as the premium upgrade — they're not in competition.", sales:"'Great — PRP is the foundation. Exosomes are the upgrade. 380 growth factors versus 12, no blood draw, consistent potency. Offer both and charge more for the premium option.'", category:"Objections" },
+      { id:"sp3",  front:"How do you explain 503A compounding to a skeptical physician?", back:"503A pharmacies create patient-specific compounded medications under state pharmacy board oversight. During FDA drug shortage periods, 503As can legally compound copies of shortage drugs. Each prescription is for an individual patient — not bulk manufacturing. PCAB accreditation signals quality compliance.", sales:"'We operate under the 503A model — patient-specific, state-licensed, legal during active shortage periods. Our pharmacist monitors the shortage list and our compliance team stays current. This is established, legitimate medicine.'", category:"Compliance" },
+      { id:"sp4",  front:"What's your pitch for a men's health / TRT clinic?", back:"TRT patients are already biohacking-minded and cash-pay. Natural extensions: PT-141 for libido, BPC-157/TB-500 for athletic performance, GH peptides for body composition, ED Exosome + AM Matrix for patients not getting full TRT results.", sales:"'Your TRT patients are your best peptide customers — cash-pay, motivated, already biohacking-minded. PT-141, GH peptides, Wolverine for the active guys — these are natural extensions of what they're already doing.'", category:"Door Openers" },
+      { id:"sp5",  front:"What's your functional medicine practice pitch?", back:"Functional medicine docs already believe in root-cause treatment. Entry points: TA1 for immune patients (long COVID, chronic infections), NAD+ for energy/aging, Semax/Selank for cognitive and anxiety patients, PE-22-28 for mood/SSRI alternatives, Epithalon for anti-aging protocols.", sales:"'Functional medicine is where peptides were born in the US market. These docs have the mindset — they just need the right supplier. Lead with TA1 for immune and NAD for energy, then let patient demand pull through the rest.'", category:"Door Openers" },
+      { id:"sp6",  front:"What is the private label opportunity?", back:"The lab offers private label — the product ships with the practice's branding on the label (e.g., 'Healthy Hair Society'). Increases practice buy-in, patient loyalty to the practice, and perceived value. Higher margin for the practice, more stickiness for you as the rep.", sales:"'The private label option is powerful for retention — when the label says their name, patients reorder through them. It also shows you're thinking about their business long-term, not just moving product.'", category:"Strategy" },
+      { id:"sp7",  front:"What's the drop-ship vs. in-office inventory conversation?", back:"In-office inventory: practice orders in volume at discount, dispenses in-person, higher margin. Drop-ship: practice sends patient shipping info, lab ships directly to patient — ideal for telehealth. Both options available; in-office has better margins, drop-ship enables telehealth scale.", sales:"'Telehealth practices love drop-ship — they see the patient on screen, send us the order, we handle fulfillment. For in-person practices, in-office inventory is higher margin and creates a tangible point of care experience.'", category:"Strategy" },
+      { id:"sp8",  front:"What's your pitch for an aesthetics / medi-spa practice?", back:"Medi-spas doing microneedling and laser are a perfect fit for: topical exosomes post-procedure, GHKCu topical spray, GLOW/KLOW injectable stacks, NanoPen PRO microneedling device, and PRP kits (HA or Biotin). Multiple product lines, one relationship.", sales:"'You're already creating the channel for exosomes every time you needle. The topical exosome is the natural premium add-on — better results, shorter downtime, $200–$400 more per treatment. I can also help upgrade your PRP protocol and microneedling equipment.'", category:"Door Openers" },
+      { id:"sp9",  front:"What's your pitch for an oral surgeon or periodontist?", back:"MSC-derived exosomes are angiogenic, anti-inflammatory, anti-fibrotic, and anti-microbial in dental/periodontal settings. Applications: post-extraction healing, implant osseointegration, graft outcomes, and periodontal tissue repair. Most reps never mention this to dental practices.", sales:"'I'm probably the first rep who's talked to you about exosomes in a dental context. The healing and tissue repair story is directly applicable to implants and grafts — less inflammation, faster healing, better outcomes.'", category:"Door Openers" },
+      { id:"sp10", front:"What's your pitch for an orthopedic or sports medicine practice?", back:"Wharton's Jelly ECM Scaffold is a viscoelastic biologic shock absorber for intra-articular injections — knees, shoulders, spine, small joints. Also: Wolverine stack for tissue repair, SS-31 for mitochondrial recovery, and VitalitySpin large-format centrifuge for high-volume PRP.", sales:"'For ortho: the ECM scaffold is a biologic alternative for patients who aren't surgical candidates or who want to delay joint replacement. Wolverine stack for the athlete or active patient. Large-format centrifuge gives you high-volume PRP in-house.'", category:"Door Openers" },
       { id:"sp11", front:"How do you explain the ordering process to a new provider?", back:"1. Fax or email order to the lab (in-office or patient drop-ship). 2. Lab keeps card on file — charged each order. 3. Can flag orders as refillable. 4. Product ships to office or directly to patient. 5. Provider sets their own retail price above wholesale. Can be lyophilized or with bacteriostatic water added.", sales:"'Very simple — fax or email the order, card on file gets charged, product ships. For telehealth, we ship straight to the patient. You set your own retail price above wholesale. No minimums to get started.'", category:"Strategy" },
     ]
   }
@@ -128,36 +130,74 @@ const ALL_CARDS = Object.entries(TOPICS).flatMap(([topicKey, topic]) =>
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
+// ─── STORAGE HELPERS ──────────────────────────────────────────────────────────
+const STORAGE_KEY = "msa_history_v1";
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
+}
+function saveHistory(h) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h.slice(-100))); } catch {}
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
 function App() {
-  const [screen, setScreen] = useState("home");
+  const [screen, setScreen]           = useState("home"); // home | session | complete | dashboard
   const [activeTopic, setActiveTopic] = useState("all");
-  const [mode, setMode] = useState("flashcard");
-  const [cards, setCards] = useState([]);
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [showSales, setShowSales] = useState(false);
-  const [score, setScore] = useState({ correct: 0, incorrect: 0 });
+  const [mode, setMode]               = useState("flashcard");
+  const [cards, setCards]             = useState([]);
+  const [currentIdx, setCurrentIdx]   = useState(0);
+  const [flipped, setFlipped]         = useState(false);
+  const [showSales, setShowSales]     = useState(false);
+  const [score, setScore]             = useState({ correct: 0, incorrect: 0 });
   const [quizSelected, setQuizSelected] = useState(null);
-  const [quizOptions, setQuizOptions] = useState([]);
-  const [completed, setCompleted] = useState(false);
-  const [streak, setStreak] = useState(0);
+  const [quizOptions, setQuizOptions]   = useState([]);
+  const [completed, setCompleted]       = useState(false);
+  const [streak, setStreak]             = useState(0);
+  const [history, setHistory]           = useState(loadHistory);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
 
   const getCards = (topic) => shuffle(topic === "all" ? ALL_CARDS : ALL_CARDS.filter(c => c.topicKey === topic));
-  const genQuizOptions = (card, pool) => shuffle([card, ...shuffle(pool.filter(c => c.id !== card.id)).slice(0, 3)]);
+  const genOpts  = (card, pool) => shuffle([card, ...shuffle(pool.filter(c => c.id !== card.id)).slice(0, 3)]);
 
   const startSession = (topic, m) => {
     const deck = getCards(topic);
     setCards(deck); setCurrentIdx(0); setFlipped(false); setShowSales(false);
     setScore({ correct: 0, incorrect: 0 }); setQuizSelected(null); setCompleted(false);
-    setActiveTopic(topic); setMode(m);
-    if (m === "quiz") setQuizOptions(genQuizOptions(deck[0], deck));
+    setActiveTopic(topic); setMode(m); setShowEndConfirm(false);
+    if (m === "quiz") setQuizOptions(genOpts(deck[0], deck));
     setScreen("session");
   };
 
+  const finishSession = (finalScore, cardsAnswered) => {
+    if (cardsAnswered === 0) { setScreen("home"); return; }
+    const entry = {
+      date: new Date().toLocaleDateString("en-US", { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }),
+      topic: activeTopic === "all" ? "All Topics" : TOPICS[activeTopic]?.label,
+      topicKey: activeTopic,
+      mode,
+      correct: finalScore.correct,
+      total: cardsAnswered,
+      pct: Math.round((finalScore.correct / cardsAnswered) * 100)
+    };
+    const newHistory = [...history, entry];
+    setHistory(newHistory);
+    saveHistory(newHistory);
+    setCompleted(true);
+    setScreen("complete");
+  };
+
+  const endSessionEarly = () => {
+    const answered = score.correct + score.incorrect;
+    finishSession(score, answered);
+    setShowEndConfirm(false);
+  };
+
   const nextFlashcard = (result) => {
-    setScore(s => ({ ...s, [result]: s[result] + 1 }));
+    const newScore = { ...score, [result]: score[result] + 1 };
+    setScore(newScore);
     if (result === "correct") setStreak(s => s + 1); else setStreak(0);
-    if (currentIdx + 1 >= cards.length) setCompleted(true);
+    const answered = newScore.correct + newScore.incorrect;
+    if (currentIdx + 1 >= cards.length) { finishSession(newScore, answered); }
     else { setCurrentIdx(i => i + 1); setFlipped(false); setShowSales(false); }
   };
 
@@ -169,185 +209,273 @@ function App() {
   };
 
   const nextQuiz = () => {
-    if (currentIdx + 1 >= cards.length) setCompleted(true);
-    else { const n = currentIdx + 1; setCurrentIdx(n); setQuizSelected(null); setQuizOptions(genQuizOptions(cards[n], cards)); }
+    const newScore = score;
+    const answered = newScore.correct + newScore.incorrect;
+    if (currentIdx + 1 >= cards.length) { finishSession(newScore, answered); }
+    else { const n = currentIdx + 1; setCurrentIdx(n); setQuizSelected(null); setQuizOptions(genOpts(cards[n], cards)); }
   };
 
-  const card = cards[currentIdx];
-  const total = cards.length;
+  const card     = cards[currentIdx];
+  const total    = cards.length;
   const progress = total > 0 ? (currentIdx / total) * 100 : 0;
-  const tc = activeTopic === "all" ? "#00E5FF" : (TOPICS[activeTopic]?.color || "#00E5FF");
-  const pct = score.correct + score.incorrect > 0 ? Math.round((score.correct / (score.correct + score.incorrect)) * 100) : 0;
+  const tc       = activeTopic === "all" ? "#00E5FF" : (TOPICS[activeTopic]?.color || "#00E5FF");
+  const answered = score.correct + score.incorrect;
+  const pct      = answered > 0 ? Math.round((score.correct / answered) * 100) : 0;
 
-  const s = (obj) => Object.entries(obj).reduce((a, [k, v]) => (a[k] = v, a), {});
+  // ── RENDER HELPERS ──────────────────────────────────────────────────────────
+  const E = React.createElement;
 
-  const gridBg = {
-    position:"fixed", inset:0, zIndex:0, pointerEvents:"none",
-    backgroundImage:`linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px)`,
-    backgroundSize:"40px 40px"
-  };
-  const glowOrb = {
-    position:"fixed", top:"-200px", right:"-200px", width:"600px", height:"600px",
-    background:`radial-gradient(circle,${tc}12 0%,transparent 70%)`,
-    borderRadius:"50%", pointerEvents:"none", zIndex:0, transition:"background 0.6s"
-  };
+  const Pill = ({ children, color, bg, border }) =>
+    E("div", { style:{ display:"inline-flex", alignItems:"center", padding:"3px 10px", borderRadius:"20px", background: bg || `${color}12`, border:`1px solid ${border || color+"25"}`, fontSize:"9px", color, letterSpacing:"2px" } }, children);
 
-  return React.createElement("div", { style:{ minHeight:"100vh", background:"#080B14", fontFamily:"'Courier New',monospace", color:"#E8EDF5", position:"relative", overflow:"hidden" } },
-    React.createElement("div", { style: gridBg }),
-    React.createElement("div", { style: glowOrb }),
-    React.createElement("div", { style:{ position:"relative", zIndex:1, maxWidth:"820px", margin:"0 auto", padding:"20px 16px" } },
+  const Btn = ({ onClick, color, bg, border, children, full, style: extraStyle }) =>
+    E("button", { onClick, style:{ ...(full ? { width:"100%" } : {}), padding:"13px 16px", background: bg || `${color}12`, border:`1px solid ${border || color}`, borderRadius:"8px", color, fontSize:"11px", letterSpacing:"2px", ...extraStyle } }, children);
 
-      // HEADER
-      React.createElement("div", { style:{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"28px", paddingTop:"8px" } },
-        React.createElement("div", { onClick:() => setScreen("home"), style:{ cursor:"pointer" } },
-          React.createElement("div", { style:{ fontSize:"9px", letterSpacing:"4px", color:tc, marginBottom:"2px" } }, "SUMMIT REP GROUP"),
-          React.createElement("div", { style:{ fontSize:"18px", fontWeight:"bold", letterSpacing:"2px" } }, "MED SALES ACADEMY")
-        ),
-        React.createElement("div", { style:{ display:"flex", gap:"8px", alignItems:"center" } },
-          streak > 1 && React.createElement("div", { style:{ background:`${tc}20`, border:`1px solid ${tc}50`, padding:"5px 12px", borderRadius:"20px", fontSize:"11px", color:tc, letterSpacing:"2px" } }, `🔥 ${streak}`),
-          React.createElement("div", { style:{ background:"#0D1220", border:"1px solid #1E2A3A", padding:"5px 12px", borderRadius:"20px", fontSize:"11px", color:"#556677" } }, `${ALL_CARDS.length} CARDS`)
+  // ── DASHBOARD ───────────────────────────────────────────────────────────────
+  const Dashboard = () => {
+    const topicStats = Object.entries(TOPICS).map(([key, t]) => {
+      const sessions = history.filter(h => h.topicKey === key);
+      if (!sessions.length) return { key, label: t.label, color: t.color, icon: t.icon, sessions: 0, bestPct: null, lastPct: null };
+      const best = Math.max(...sessions.map(s => s.pct));
+      const last = sessions[sessions.length - 1].pct;
+      return { key, label: t.label, color: t.color, icon: t.icon, sessions: sessions.length, bestPct: best, lastPct: last };
+    });
+    const allSessions = history.filter(h => h.topicKey === "all");
+    const totalSessions = history.length;
+    const overallBest = history.length ? Math.max(...history.map(h => h.pct)) : null;
+    const recent = [...history].reverse().slice(0, 8);
+
+    return E("div", null,
+      E("div", { style:{ fontSize:"11px", color:"#556677", letterSpacing:"3px", marginBottom:"16px" } }, "PROGRESS DASHBOARD"),
+
+      // Summary row
+      E("div", { style:{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"10px", marginBottom:"20px" } },
+        [
+          { label:"SESSIONS", val: totalSessions || "—" },
+          { label:"BEST SCORE", val: overallBest !== null ? `${overallBest}%` : "—" },
+          { label:"LAST SCORE", val: history.length ? `${history[history.length-1].pct}%` : "—" }
+        ].map(({ label, val }) =>
+          E("div", { key: label, style:{ padding:"14px", background:"#0D1220", border:"1px solid #1E2A3A", borderRadius:"8px", textAlign:"center" } },
+            E("div", { style:{ fontSize:"22px", fontWeight:"bold", color: tc, marginBottom:"4px" } }, val),
+            E("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, label)
+          )
         )
       ),
 
-      // HOME
-      screen === "home" && React.createElement("div", null,
-        React.createElement("div", { style:{ fontSize:"11px", color:"#556677", letterSpacing:"3px", marginBottom:"12px" } }, "SELECT TOPIC"),
-        React.createElement("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"28px" } },
-          [{ key:"all", label:"All Topics", color:"#FFFFFF", icon:"◉", desc:`${ALL_CARDS.length} cards` },
-           ...Object.entries(TOPICS).map(([k,v]) => ({ key:k, label:v.label, color:v.color, icon:v.icon, desc:`${v.cards.length} cards` }))
-          ].map(t => React.createElement("div", {
-            key: t.key,
-            onClick: () => setActiveTopic(t.key),
-            style:{ padding:"14px 16px", background: activeTopic===t.key ? `${t.color}15` : "#0D1220", border:`1px solid ${activeTopic===t.key ? t.color : "#1E2A3A"}`, borderRadius:"8px", cursor:"pointer", display:"flex", alignItems:"center", gap:"10px" }
-          },
-            React.createElement("span", { style:{ fontSize:"18px", color:t.color } }, t.icon),
-            React.createElement("div", null,
-              React.createElement("div", { style:{ fontSize:"11px", fontWeight:"bold", letterSpacing:"1px", color: activeTopic===t.key ? t.color : "#E8EDF5" } }, t.label),
-              React.createElement("div", { style:{ fontSize:"10px", color:"#445566", marginTop:"2px" } }, t.desc)
+      // Per-topic breakdown
+      E("div", { style:{ fontSize:"10px", color:"#556677", letterSpacing:"3px", marginBottom:"10px" } }, "BY TOPIC"),
+      E("div", { style:{ display:"grid", gap:"8px", marginBottom:"20px" } },
+        topicStats.map(t =>
+          E("div", { key: t.key, style:{ padding:"12px 16px", background:"#0D1220", border:"1px solid #1E2A3A", borderRadius:"8px", display:"flex", alignItems:"center", gap:"12px" } },
+            E("span", { style:{ fontSize:"16px", color: t.color } }, t.icon),
+            E("div", { style:{ flex:1 } },
+              E("div", { style:{ fontSize:"11px", color:"#C8D4E0", letterSpacing:"1px", marginBottom:"4px" } }, t.label),
+              t.sessions > 0
+                ? E("div", { style:{ height:"3px", background:"#1E2A3A", borderRadius:"2px" } },
+                    E("div", { style:{ height:"100%", width:`${t.lastPct}%`, background: t.color, borderRadius:"2px", transition:"width 0.6s" } })
+                  )
+                : E("div", { style:{ fontSize:"9px", color:"#334455" } }, "no sessions yet")
+            ),
+            t.sessions > 0 && E("div", { style:{ textAlign:"right" } },
+              E("div", { style:{ fontSize:"14px", fontWeight:"bold", color: t.lastPct >= 80 ? "#69FF47" : t.lastPct >= 50 ? t.color : "#FF6B6B" } }, `${t.lastPct}%`),
+              E("div", { style:{ fontSize:"9px", color:"#445566" } }, `best: ${t.bestPct}%`)
             )
-          ))
-        ),
-
-        React.createElement("div", { style:{ fontSize:"11px", color:"#556677", letterSpacing:"3px", marginBottom:"12px" } }, "SELECT MODE"),
-        React.createElement("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"28px" } },
-          [{ m:"flashcard", label:"Flashcards", icon:"⟳", desc:"Flip & study" },
-           { m:"quiz", label:"Quiz Mode", icon:"⬡", desc:"Multiple choice" }
-          ].map(({m,label,icon,desc}) => React.createElement("div", {
-            key: m,
-            onClick: () => setMode(m),
-            style:{ padding:"18px", background: mode===m ? `${tc}10` : "#0D1220", border:`1px solid ${mode===m ? tc : "#1E2A3A"}`, borderRadius:"8px", cursor:"pointer", textAlign:"center" }
-          },
-            React.createElement("div", { style:{ fontSize:"26px", marginBottom:"6px" } }, icon),
-            React.createElement("div", { style:{ fontSize:"12px", fontWeight:"bold", color: mode===m ? tc : "#E8EDF5", letterSpacing:"1px" } }, label),
-            React.createElement("div", { style:{ fontSize:"10px", color:"#445566", marginTop:"3px" } }, desc)
-          ))
-        ),
-
-        React.createElement("button", {
-          onClick: () => startSession(activeTopic, mode),
-          style:{ width:"100%", padding:"18px", background:`${tc}15`, border:`1px solid ${tc}`, borderRadius:"8px", color:tc, fontSize:"13px", letterSpacing:"3px", fontWeight:"bold" }
-        }, "START SESSION →")
+          )
+        )
       ),
 
-      // SESSION
-      screen === "session" && !completed && card && React.createElement("div", null,
-        // Progress
-        React.createElement("div", { style:{ marginBottom:"16px" } },
-          React.createElement("div", { style:{ display:"flex", justifyContent:"space-between", fontSize:"10px", color:"#556677", letterSpacing:"2px", marginBottom:"7px" } },
-            React.createElement("span", null, `${currentIdx+1} / ${total}`),
-            React.createElement("span", { style:{ color:tc } }, card.topicLabel.toUpperCase()),
-            React.createElement("span", null, `✓${score.correct} ✗${score.incorrect}`)
+      // Recent sessions
+      history.length > 0 && E("div", null,
+        E("div", { style:{ fontSize:"10px", color:"#556677", letterSpacing:"3px", marginBottom:"10px" } }, "RECENT SESSIONS"),
+        E("div", { style:{ display:"grid", gap:"6px", marginBottom:"20px" } },
+          recent.map((h, i) =>
+            E("div", { key: i, style:{ padding:"10px 14px", background:"#0A0F1A", border:"1px solid #161E2E", borderRadius:"8px", display:"flex", justifyContent:"space-between", alignItems:"center" } },
+              E("div", null,
+                E("div", { style:{ fontSize:"11px", color:"#8899AA", marginBottom:"2px" } }, h.topic),
+                E("div", { style:{ fontSize:"9px", color:"#445566" } }, `${h.date} · ${h.mode} · ${h.correct}/${h.total}`)
+              ),
+              E("div", { style:{ fontSize:"16px", fontWeight:"bold", color: h.pct >= 80 ? "#69FF47" : h.pct >= 50 ? "#FFB74D" : "#FF6B6B" } }, `${h.pct}%`)
+            )
+          )
+        )
+      ),
+
+      history.length > 0 && E("button", {
+        onClick: () => { if (confirm("Clear all history?")) { setHistory([]); saveHistory([]); } },
+        style:{ padding:"10px", background:"transparent", border:"1px solid #331111", borderRadius:"8px", color:"#553333", fontSize:"10px", letterSpacing:"2px", width:"100%", marginBottom:"16px" }
+      }, "CLEAR HISTORY"),
+
+      Btn({ onClick:() => setScreen("home"), color: tc, full: true, children: "← BACK TO HOME" })
+    );
+  };
+
+  // ── MAIN RENDER ─────────────────────────────────────────────────────────────
+  return E("div", { style:{ minHeight:"100vh", background:"#080B14", fontFamily:"'Courier New',monospace", color:"#E8EDF5", position:"relative", overflow:"hidden" } },
+    E("div", { style:{ position:"fixed", inset:0, zIndex:0, pointerEvents:"none", backgroundImage:`linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px)`, backgroundSize:"40px 40px" } }),
+    E("div", { style:{ position:"fixed", top:"-200px", right:"-200px", width:"600px", height:"600px", background:`radial-gradient(circle,${tc}12 0%,transparent 70%)`, borderRadius:"50%", pointerEvents:"none", zIndex:0, transition:"background 0.6s" } }),
+
+    E("div", { style:{ position:"relative", zIndex:1, maxWidth:"820px", margin:"0 auto", padding:"20px 16px", paddingBottom:"40px" } },
+
+      // HEADER
+      E("div", { style:{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"24px", paddingTop:"8px" } },
+        E("div", { onClick:() => setScreen("home"), style:{ cursor:"pointer" } },
+          E("div", { style:{ fontSize:"9px", letterSpacing:"4px", color:tc, marginBottom:"2px" } }, "SUMMIT REP GROUP"),
+          E("div", { style:{ fontSize:"18px", fontWeight:"bold", letterSpacing:"2px" } }, "MED SALES ACADEMY")
+        ),
+        E("div", { style:{ display:"flex", gap:"8px", alignItems:"center" } },
+          streak > 1 && E("div", { style:{ background:`${tc}20`, border:`1px solid ${tc}50`, padding:"5px 10px", borderRadius:"20px", fontSize:"11px", color:tc } }, `🔥 ${streak}`),
+          E("button", {
+            onClick: () => setScreen("dashboard"),
+            style:{ background:"#0D1220", border:"1px solid #1E2A3A", padding:"5px 12px", borderRadius:"20px", fontSize:"11px", color: history.length ? "#AAB8C8" : "#445566" }
+          }, `📊 ${history.length}`)
+        )
+      ),
+
+      // ── HOME ──────────────────────────────────────────────────────────────
+      screen === "home" && E("div", null,
+        E("div", { style:{ fontSize:"11px", color:"#556677", letterSpacing:"3px", marginBottom:"12px" } }, "SELECT TOPIC"),
+        E("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"24px" } },
+          [{ key:"all", label:"All Topics", color:"#FFFFFF", icon:"◉", desc:`${ALL_CARDS.length} cards` },
+           ...Object.entries(TOPICS).map(([k,v]) => ({ key:k, label:v.label, color:v.color, icon:v.icon, desc:`${v.cards.length} cards` }))
+          ].map(t => {
+            const tHistory = history.filter(h => h.topicKey === t.key);
+            const lastPct = tHistory.length ? tHistory[tHistory.length-1].pct : null;
+            return E("div", { key: t.key, onClick: () => setActiveTopic(t.key), style:{ padding:"12px 14px", background: activeTopic===t.key ? `${t.color}15` : "#0D1220", border:`1px solid ${activeTopic===t.key ? t.color : "#1E2A3A"}`, borderRadius:"8px", cursor:"pointer", display:"flex", alignItems:"center", gap:"10px" } },
+              E("span", { style:{ fontSize:"16px", color:t.color } }, t.icon),
+              E("div", { style:{ flex:1 } },
+                E("div", { style:{ fontSize:"11px", fontWeight:"bold", letterSpacing:"1px", color: activeTopic===t.key ? t.color : "#E8EDF5" } }, t.label),
+                E("div", { style:{ fontSize:"9px", color:"#445566", marginTop:"2px" } }, t.desc)
+              ),
+              lastPct !== null && E("div", { style:{ fontSize:"12px", color: lastPct >= 80 ? "#69FF47" : lastPct >= 50 ? t.color : "#FF6B6B", fontWeight:"bold" } }, `${lastPct}%`)
+            );
+          })
+        ),
+
+        E("div", { style:{ fontSize:"11px", color:"#556677", letterSpacing:"3px", marginBottom:"12px" } }, "SELECT MODE"),
+        E("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"24px" } },
+          [{ m:"flashcard", label:"Flashcards", icon:"⟳", desc:"Flip & study" },
+           { m:"quiz", label:"Quiz Mode", icon:"⬡", desc:"Multiple choice" }
+          ].map(({m, label, icon, desc}) => E("div", { key:m, onClick:() => setMode(m), style:{ padding:"16px", background: mode===m ? `${tc}10` : "#0D1220", border:`1px solid ${mode===m ? tc : "#1E2A3A"}`, borderRadius:"8px", cursor:"pointer", textAlign:"center" } },
+            E("div", { style:{ fontSize:"24px", marginBottom:"6px" } }, icon),
+            E("div", { style:{ fontSize:"12px", fontWeight:"bold", color: mode===m ? tc : "#E8EDF5", letterSpacing:"1px" } }, label),
+            E("div", { style:{ fontSize:"10px", color:"#445566", marginTop:"3px" } }, desc)
+          ))
+        ),
+        Btn({ onClick:() => startSession(activeTopic, mode), color:tc, full:true, children:"START SESSION →", style:{ fontSize:"13px", letterSpacing:"3px", fontWeight:"bold", padding:"18px" } })
+      ),
+
+      // ── SESSION ───────────────────────────────────────────────────────────
+      screen === "session" && !completed && card && E("div", null,
+
+        // End session confirm overlay
+        showEndConfirm && E("div", { style:{ position:"fixed", inset:0, background:"rgba(8,11,20,0.92)", zIndex:50, display:"flex", alignItems:"center", justifyContent:"center", padding:"20px" } },
+          E("div", { style:{ background:"#0D1220", border:"1px solid #2A3A4A", borderRadius:"12px", padding:"28px", maxWidth:"320px", width:"100%", textAlign:"center" } },
+            E("div", { style:{ fontSize:"28px", marginBottom:"12px" } }, "⏹"),
+            E("div", { style:{ fontSize:"13px", letterSpacing:"2px", color:"#AAB8C8", marginBottom:"8px" } }, "END SESSION?"),
+            E("div", { style:{ fontSize:"11px", color:"#556677", marginBottom:"24px", lineHeight:"1.6" } }, `${answered} cards answered · ${score.correct} correct\nProgress will be saved to your history.`),
+            E("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" } },
+              E("button", { onClick:() => setShowEndConfirm(false), style:{ padding:"13px", background:"#080B14", border:"1px solid #1E2A3A", borderRadius:"8px", color:"#8899AA", fontSize:"11px", letterSpacing:"2px" } }, "KEEP GOING"),
+              E("button", { onClick: endSessionEarly, style:{ padding:"13px", background:"#1A0808", border:"1px solid #883333", borderRadius:"8px", color:"#FF6B6B", fontSize:"11px", letterSpacing:"2px" } }, "END & SAVE")
+            )
+          )
+        ),
+
+        // Progress bar
+        E("div", { style:{ marginBottom:"14px" } },
+          E("div", { style:{ display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:"10px", color:"#556677", letterSpacing:"2px", marginBottom:"7px" } },
+            E("span", null, `${currentIdx+1} / ${total}`),
+            E("span", { style:{ color:tc } }, card.topicLabel.toUpperCase()),
+            E("div", { style:{ display:"flex", alignItems:"center", gap:"8px" } },
+              E("span", null, `✓${score.correct} ✗${score.incorrect}`),
+              E("button", { onClick:() => setShowEndConfirm(true), style:{ background:"transparent", border:"1px solid #2A3A4A", borderRadius:"6px", color:"#445566", fontSize:"9px", letterSpacing:"1px", padding:"3px 8px" } }, "END")
+            )
           ),
-          React.createElement("div", { style:{ height:"2px", background:"#1E2A3A", borderRadius:"1px" } },
-            React.createElement("div", { style:{ height:"100%", width:`${progress}%`, background:tc, borderRadius:"1px", transition:"width 0.4s" } })
+          E("div", { style:{ height:"2px", background:"#1E2A3A", borderRadius:"1px" } },
+            E("div", { style:{ height:"100%", width:`${progress}%`, background:tc, borderRadius:"1px", transition:"width 0.4s" } })
           )
         ),
 
         // Category badge
-        React.createElement("div", { style:{ display:"inline-flex", marginBottom:"12px", padding:"3px 10px", borderRadius:"20px", background:`${tc}12`, border:`1px solid ${tc}25`, fontSize:"9px", color:tc, letterSpacing:"2px" } }, card.category.toUpperCase()),
+        E(Pill, { color:tc }, card.category.toUpperCase()),
+        E("div", { style:{ marginBottom:"12px" } }),
 
-        // FLASHCARD
-        mode === "flashcard" && React.createElement("div", null,
-          React.createElement("div", {
-            onClick: () => setFlipped(f => !f),
-            style:{ minHeight:"190px", padding:"26px", background:"#0D1220", border:`1px solid ${flipped ? tc+"50" : "#1E2A3A"}`, borderRadius:"12px", cursor:"pointer", marginBottom:"12px", transition:"border-color 0.3s", position:"relative" }
-          },
-            React.createElement("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"3px", marginBottom:"14px" } }, flipped ? "ANSWER" : "QUESTION — tap to flip"),
-            React.createElement("div", { style:{ fontSize:"14px", lineHeight:"1.8", whiteSpace:"pre-line" } }, flipped ? card.back : card.front),
-            flipped && card.sizes && React.createElement("div", { style:{ marginTop:"14px", display:"inline-flex", alignItems:"center", gap:"6px", padding:"4px 10px", background:"#0A1520", border:"1px solid #1E3A5A", borderRadius:"20px" } },
-              React.createElement("span", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "VIAL SIZES"),
-              React.createElement("span", { style:{ fontSize:"10px", color:"#6AAFCC", letterSpacing:"1px" } }, card.sizes)
+        // FLASHCARD MODE
+        mode === "flashcard" && E("div", null,
+          E("div", { onClick:() => setFlipped(f => !f), style:{ minHeight:"190px", padding:"26px", background:"#0D1220", border:`1px solid ${flipped ? tc+"50" : "#1E2A3A"}`, borderRadius:"12px", cursor:"pointer", marginBottom:"12px", transition:"border-color 0.3s", position:"relative" } },
+            E("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"3px", marginBottom:"14px" } }, flipped ? "ANSWER" : "QUESTION — tap to flip"),
+            E("div", { style:{ fontSize:"14px", lineHeight:"1.8", whiteSpace:"pre-line" } }, flipped ? card.back : card.front),
+            flipped && card.sizes && E("div", { style:{ marginTop:"14px", display:"inline-flex", alignItems:"center", gap:"6px", padding:"4px 10px", background:"#0A1520", border:"1px solid #1E3A5A", borderRadius:"20px" } },
+              E("span", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "VIAL SIZES"),
+              E("span", { style:{ fontSize:"10px", color:"#6AAFCC" } }, card.sizes)
             ),
-            !flipped && React.createElement("div", { style:{ position:"absolute", bottom:"14px", right:"18px", fontSize:"18px", color:"#1E2A3A" } }, "⟳")
+            !flipped && E("div", { style:{ position:"absolute", bottom:"14px", right:"18px", fontSize:"18px", color:"#1E2A3A" } }, "⟳")
           ),
-          flipped && React.createElement("div", null,
-            React.createElement("div", {
-              onClick: () => setShowSales(s => !s),
-              style:{ padding:"12px 16px", background: showSales ? "#0A1508" : "#0D1220", border:`1px solid ${showSales ? "#69FF47" : "#1E2A3A"}`, borderRadius:"8px", cursor:"pointer", marginBottom:"12px", transition:"all 0.3s" }
-            },
-              React.createElement("div", { style:{ fontSize:"9px", color:"#69FF47", letterSpacing:"3px", marginBottom: showSales ? "10px" : "0" } }, `💼 SALES ANGLE ${showSales ? "▼" : "▶"}`),
-              showSales && React.createElement("div", { style:{ fontSize:"13px", lineHeight:"1.7", color:"#B0CCA8", fontStyle:"italic" } }, card.sales)
+          flipped && E("div", null,
+            E("div", { onClick:() => setShowSales(s => !s), style:{ padding:"12px 16px", background: showSales ? "#0A1508" : "#0D1220", border:`1px solid ${showSales ? "#69FF47" : "#1E2A3A"}`, borderRadius:"8px", cursor:"pointer", marginBottom:"12px", transition:"all 0.3s" } },
+              E("div", { style:{ fontSize:"9px", color:"#69FF47", letterSpacing:"3px", marginBottom: showSales ? "10px" : "0" } }, `💼 SALES ANGLE ${showSales ? "▼" : "▶"}`),
+              showSales && E("div", { style:{ fontSize:"13px", lineHeight:"1.7", color:"#B0CCA8", fontStyle:"italic" } }, card.sales)
             ),
-            React.createElement("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" } },
-              React.createElement("button", { onClick:() => nextFlashcard("incorrect"), style:{ padding:"14px", background:"#150808", border:"1px solid #883333", borderRadius:"8px", color:"#FF6B6B", fontSize:"11px", letterSpacing:"2px" } }, "✗ MISSED"),
-              React.createElement("button", { onClick:() => nextFlashcard("correct"), style:{ padding:"14px", background:"#08150A", border:`1px solid ${tc}`, borderRadius:"8px", color:tc, fontSize:"11px", letterSpacing:"2px" } }, "✓ GOT IT")
+            E("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" } },
+              E("button", { onClick:() => nextFlashcard("incorrect"), style:{ padding:"14px", background:"#150808", border:"1px solid #883333", borderRadius:"8px", color:"#FF6B6B", fontSize:"11px", letterSpacing:"2px" } }, "✗ MISSED"),
+              E("button", { onClick:() => nextFlashcard("correct"), style:{ padding:"14px", background:"#08150A", border:`1px solid ${tc}`, borderRadius:"8px", color:tc, fontSize:"11px", letterSpacing:"2px" } }, "✓ GOT IT")
             )
           )
         ),
 
-        // QUIZ
-        mode === "quiz" && React.createElement("div", null,
-          React.createElement("div", { style:{ padding:"22px 26px", background:"#0D1220", border:"1px solid #1E2A3A", borderRadius:"12px", marginBottom:"14px" } },
-            React.createElement("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"3px", marginBottom:"12px" } }, "WHAT IS THIS?"),
-            React.createElement("div", { style:{ fontSize:"14px", lineHeight:"1.75" } }, card.back.split("\n")[0])
+        // QUIZ MODE
+        mode === "quiz" && E("div", null,
+          E("div", { style:{ padding:"22px 26px", background:"#0D1220", border:"1px solid #1E2A3A", borderRadius:"12px", marginBottom:"14px" } },
+            E("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"3px", marginBottom:"12px" } }, "WHAT IS THIS?"),
+            E("div", { style:{ fontSize:"14px", lineHeight:"1.75" } }, card.back.split("\n")[0])
           ),
-          React.createElement("div", { style:{ display:"grid", gap:"9px", marginBottom:"12px" } },
+          E("div", { style:{ display:"grid", gap:"9px", marginBottom:"12px" } },
             quizOptions.map(opt => {
               const isSel = quizSelected?.id === opt.id;
               const isCorr = opt.id === card.id;
               let border="#1E2A3A", bg="#0D1220", color="#E8EDF5";
               if (quizSelected) { if (isCorr) { border="#69FF47"; bg="#081A0E"; color="#69FF47"; } else if (isSel) { border="#CC4444"; bg="#1A0808"; color="#FF6B6B"; } }
-              return React.createElement("div", {
-                key: opt.id,
-                onClick: () => !quizSelected && selectQuiz(opt),
-                style:{ padding:"14px 18px", background:bg, border:`1px solid ${border}`, borderRadius:"8px", cursor: quizSelected ? "default" : "pointer", color, fontSize:"13px", lineHeight:"1.5", transition:"all 0.2s" }
-              }, opt.front);
+              return E("div", { key:opt.id, onClick:() => !quizSelected && selectQuiz(opt), style:{ padding:"14px 18px", background:bg, border:`1px solid ${border}`, borderRadius:"8px", cursor: quizSelected ? "default" : "pointer", color, fontSize:"13px", lineHeight:"1.5", transition:"all 0.2s" } }, opt.front);
             })
           ),
-          quizSelected && React.createElement("div", null,
-            React.createElement("div", { style:{ padding:"13px 16px", background:"#06100E", border:"1px solid #1A3020", borderRadius:"8px", marginBottom:"10px" } },
-              React.createElement("div", { style:{ fontSize:"9px", color:"#69FF47", letterSpacing:"3px", marginBottom:"8px" } }, "💼 SALES ANGLE"),
-              React.createElement("div", { style:{ fontSize:"12px", lineHeight:"1.7", color:"#A0BCA0", fontStyle:"italic" } }, card.sales),
-              card.sizes && React.createElement("div", { style:{ marginTop:"10px", display:"inline-flex", alignItems:"center", gap:"6px", padding:"3px 9px", background:"#0A1520", border:"1px solid #1E3A5A", borderRadius:"20px" } },
-                React.createElement("span", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "VIAL SIZES"),
-                React.createElement("span", { style:{ fontSize:"10px", color:"#6AAFCC" } }, card.sizes)
+          quizSelected && E("div", null,
+            E("div", { style:{ padding:"13px 16px", background:"#06100E", border:"1px solid #1A3020", borderRadius:"8px", marginBottom:"10px" } },
+              E("div", { style:{ fontSize:"9px", color:"#69FF47", letterSpacing:"3px", marginBottom:"8px" } }, "💼 SALES ANGLE"),
+              E("div", { style:{ fontSize:"12px", lineHeight:"1.7", color:"#A0BCA0", fontStyle:"italic" } }, card.sales),
+              card.sizes && E("div", { style:{ marginTop:"10px", display:"inline-flex", alignItems:"center", gap:"6px", padding:"3px 9px", background:"#0A1520", border:"1px solid #1E3A5A", borderRadius:"20px" } },
+                E("span", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "VIAL SIZES"),
+                E("span", { style:{ fontSize:"10px", color:"#6AAFCC" } }, card.sizes)
               )
             ),
-            React.createElement("button", { onClick: nextQuiz, style:{ width:"100%", padding:"13px", background:`${tc}12`, border:`1px solid ${tc}`, borderRadius:"8px", color:tc, fontSize:"11px", letterSpacing:"3px" } }, "NEXT →")
+            Btn({ onClick: nextQuiz, color:tc, full:true, children:"NEXT →", style:{ letterSpacing:"3px" } })
           )
         )
       ),
 
-      // COMPLETE
-      screen === "session" && completed && React.createElement("div", { style:{ textAlign:"center", paddingTop:"48px" } },
-        React.createElement("div", { style:{ fontSize:"52px", marginBottom:"12px" } }, pct >= 80 ? "🏆" : pct >= 50 ? "💪" : "📚"),
-        React.createElement("div", { style:{ fontSize:"10px", color:tc, letterSpacing:"4px", marginBottom:"6px" } }, "SESSION COMPLETE"),
-        React.createElement("div", { style:{ fontSize:"42px", fontWeight:"bold", marginBottom:"24px" } }, `${pct}%`),
-        React.createElement("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", maxWidth:"260px", margin:"0 auto 24px" } },
-          React.createElement("div", { style:{ padding:"14px", background:"#051008", border:"1px solid #69FF47", borderRadius:"8px" } },
-            React.createElement("div", { style:{ fontSize:"28px", color:"#69FF47", fontWeight:"bold" } }, score.correct),
-            React.createElement("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "CORRECT")
+      // ── COMPLETE ──────────────────────────────────────────────────────────
+      screen === "complete" && E("div", { style:{ textAlign:"center", paddingTop:"40px" } },
+        E("div", { style:{ fontSize:"52px", marginBottom:"12px" } }, pct >= 80 ? "🏆" : pct >= 50 ? "💪" : "📚"),
+        E("div", { style:{ fontSize:"10px", color:tc, letterSpacing:"4px", marginBottom:"6px" } }, answered < total ? "SESSION ENDED" : "SESSION COMPLETE"),
+        E("div", { style:{ fontSize:"42px", fontWeight:"bold", marginBottom:"6px" } }, `${pct}%`),
+        E("div", { style:{ fontSize:"10px", color:"#445566", marginBottom:"24px" } }, `${answered} of ${total} cards answered`),
+        E("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", maxWidth:"260px", margin:"0 auto 24px" } },
+          E("div", { style:{ padding:"14px", background:"#051008", border:"1px solid #69FF47", borderRadius:"8px" } },
+            E("div", { style:{ fontSize:"28px", color:"#69FF47", fontWeight:"bold" } }, score.correct),
+            E("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "CORRECT")
           ),
-          React.createElement("div", { style:{ padding:"14px", background:"#150808", border:"1px solid #883333", borderRadius:"8px" } },
-            React.createElement("div", { style:{ fontSize:"28px", color:"#FF6B6B", fontWeight:"bold" } }, score.incorrect),
-            React.createElement("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "MISSED")
+          E("div", { style:{ padding:"14px", background:"#150808", border:"1px solid #883333", borderRadius:"8px" } },
+            E("div", { style:{ fontSize:"28px", color:"#FF6B6B", fontWeight:"bold" } }, score.incorrect),
+            E("div", { style:{ fontSize:"9px", color:"#445566", letterSpacing:"2px" } }, "MISSED")
           )
         ),
-        React.createElement("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" } },
-          React.createElement("button", { onClick:() => startSession(activeTopic, mode), style:{ padding:"13px", background:`${tc}12`, border:`1px solid ${tc}`, borderRadius:"8px", color:tc, fontSize:"11px", letterSpacing:"2px" } }, "RETRY ↺"),
-          React.createElement("button", { onClick:() => setScreen("home"), style:{ padding:"13px", background:"#0D1220", border:"1px solid #1E2A3A", borderRadius:"8px", color:"#E8EDF5", fontSize:"11px", letterSpacing:"2px" } }, "HOME ⌂")
-        )
-      )
+        E("div", { style:{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"12px" } },
+          Btn({ onClick:() => startSession(activeTopic, mode), color:tc, children:"RETRY ↺" }),
+          Btn({ onClick:() => setScreen("home"), color:"#8899AA", border:"#1E2A3A", bg:"#0D1220", children:"HOME ⌂" })
+        ),
+        Btn({ onClick:() => setScreen("dashboard"), color:"#556677", border:"#1E2A3A", bg:"#080B14", full:true, children:"VIEW HISTORY →" })
+      ),
+
+      // ── DASHBOARD ─────────────────────────────────────────────────────────
+      screen === "dashboard" && E(Dashboard, null)
     )
   );
 }
